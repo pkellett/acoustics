@@ -77,8 +77,9 @@ function AudioOutput(audioOutputStart, audioOutputRender)
     }
     else //no audio output, but run the callback anyway
     {
-      document.write("<p style='background-color:yellow;'>Your browser does not support real-time audio output. Try Chrome or Firefox.</p>");
+      document.write("<font style='background-color:yellow;'>Your browser does not support real-time audio output. Try Chrome or Firefox.</font>");
 
+      audioOutputStart(sampleRate);
       var buffer = new Array(sampleRate / 10);
       setInterval(function() { renderCallback(buffer); }, 100);
     }
