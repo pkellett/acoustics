@@ -7,7 +7,7 @@
 ///
 function AudioOutput(audioOutputStart, audioOutputRender)
 {
-  var sampleRate = 44100;
+  var sampleRate = 48000;
   var audioContext = null;
 
   if(typeof AudioContext == "function")
@@ -23,9 +23,18 @@ function AudioOutput(audioOutputStart, audioOutputRender)
   {
     sampleRate = audioContext.sampleRate;
     audioOutputStart(sampleRate);
-    var node = audioContext.createJavaScriptNode(4096, 1, 1);
+    var node = audioContext.createScriptProcessor(4096, 1, 1);
     node.onaudioprocess = function(event) { audioOutputRender(event.outputBuffer.getChannelData(0)); } //specify callback
     node.connect(audioContext.destination);
+    
+    // check if we run on iOS and need a dummy oscillator
+    if(navigator.userAgent.match(/(iPad|iPhone|iPod)/g))
+    {
+	    var osc = context.createOscillator();
+	    osc.type = 0;
+	    osc.connect(node);
+	    osc.noteOn(0);
+    }
   }
   else
   {
