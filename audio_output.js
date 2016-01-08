@@ -1,4 +1,3 @@
-﻿
 ///Real-time audio output.
 ///Provide the following callback functions:
 ///
@@ -11,21 +10,21 @@ function AudioOutput(audioOutputStart, audioOutputRender)
   var audioContext = new AudioContext();
 
   audioOutputStart(audioContext.sampleRate);
-  var scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+  var scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
   scriptProcessor.onaudioprocess = function(event) { audioOutputRender(event.outputBuffer.getChannelData(0)); }
   
   var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
   if(iOS) //need a dummy oscillator?
   {
-    var osc = audioContext.createOscillator()
-	  osc.type = 0;
-	  osc.connect(processor);
+    var dummyInput = audioContext.createOscillator()
+    dummyInput.type = 0;
+    dummyInput.connect(scriptProcessor);
   }
 
-  processor.connect(audioContext.destination);
+  scriptProcessor.connect(audioContext.destination);
   if(iOS)
   {
-    osc.noteOn(0);
+    dummyInput.noteOn(0);
   }
 
   //document.write("<font style='background-color:yellow;'>Your browser does not support real-time audio output. Try Chrome or Firefox.</font>");
@@ -33,4 +32,3 @@ function AudioOutput(audioOutputStart, audioOutputRender)
   //var buffer = new Array(sampleRate / 10);
   //setInterval(function() { renderCallback(buffer); }, 100);
 }
-
