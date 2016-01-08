@@ -10,7 +10,7 @@
     <script type="text/javascript">
 
       var phase = 0.0;
-      var freq;
+      var freq = 0.0;
 
       function audioOutputStart(sampleRateHz)
       {
@@ -28,8 +28,16 @@
         }
       }
 
-      var audioOutput = new AudioOutput(audioOutputStart, audioOutputRender);
+      var audioOutput;
+      function play()
+      {
+        if(freq = 0.0)
+        {
+          audioOutput = new AudioOutput(audioOutputStart, audioOutputRender);
+        }
+      }
 
     </script>
+    <button onclick="play()">Play</button>
   </body>
 </html>
