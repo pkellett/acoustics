@@ -7,42 +7,30 @@
 ///
 function AudioOutput(audioOutputStart, audioOutputRender)
 {
-  var sampleRate = 48000;
-  var audioContext = null;
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  var audioContext = new AudioContext();
 
-  if(typeof AudioContext == "function")
+  audioOutputStart(audioContext.sampleRate);
+  var scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+  scriptProcessor.onaudioprocess = function(event) { audioOutputRender(event.outputBuffer.getChannelData(0)); }
+  
+  var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+  if(iOS) //need a dummy oscillator?
   {
-    audioContext = new AudioContext(); //try Web Audio API
-  }
-  else if(typeof webkitAudioContext == "function")
-  {
-    audioContext = new webkitAudioContext(); //didn't exist, so try with prefix
+    var osc = audioContext.createOscillator()
+	  osc.type = 0;
+	  osc.connect(processor);
   }
 
-  if(audioContext)
+  processor.connect(audioContext.destination);
+  if(iOS)
   {
-    sampleRate = audioContext.sampleRate;
-    audioOutputStart(sampleRate);
-    var node = audioContext.createScriptProcessor(2048, 1, 1);
-    node.onaudioprocess = function(event) { audioOutputRender(event.outputBuffer.getChannelData(0)); } //specify callback
-    node.connect(audioContext.destination);
-    
-    // check if we run on iOS and need a dummy oscillator
-    if(navigator.userAgent.match(/(iPad|iPhone|iPod)/g))
-    {
-      var osc = context.createOscillator();
-      osc.type = 0;
-      osc.connect(node);
-      osc.noteOn(0);
-    }
+    osc.noteOn(0);
   }
-  else //no audio output, but run the callback anyway
-  {
-    document.write("<font style='background-color:yellow;'>Your browser does not support real-time audio output. Try Chrome or Firefox.</font>");
 
-    audioOutputStart(sampleRate);
-    var buffer = new Array(sampleRate / 10);
-    setInterval(function() { renderCallback(buffer); }, 100);
-  }
+  //document.write("<font style='background-color:yellow;'>Your browser does not support real-time audio output. Try Chrome or Firefox.</font>");
+  //audioOutputStart(sampleRate);
+  //var buffer = new Array(sampleRate / 10);
+  //setInterval(function() { renderCallback(buffer); }, 100);
 }
 
