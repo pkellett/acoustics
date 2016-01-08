@@ -12,14 +12,13 @@ function AudioOutput(audioOutputStart, audioOutputRender)
   {
     document.write("<font style='background-color:yellow;'>Your browser does not support real-time audio output. Try Chrome or Firefox.</font>");
   }
-  audioOutputStart(audioContext.sampleRate);
 
+  audioOutputStart(audioContext.sampleRate);
   var scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
   scriptProcessor.onaudioprocess = function(event) { audioOutputRender(event.outputBuffer.getChannelData(0)); }
   scriptProcessor.connect(audioContext.destination);
   
-  var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
-  if(iOS) //need a dummy oscillator?
+  if(navigator.userAgent.match(/(iPad|iPhone|iPod)/g)) //need a dummy input on iOS
   {
     var dummyInput = audioContext.createOscillator()
     dummyInput.type = 0;
